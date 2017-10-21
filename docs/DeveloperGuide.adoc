@@ -582,11 +582,11 @@ The toggling mechanism is an event-driven mechanism. The above diagram shows the
 
 image::togglingMechanism2.png[width="790"]
 _Figure 22 : Sequence diagram for the first part of the toggling mechanism._
-
-As seen from the sequence diagram above, when the user type the command for toggle, an instance of `ToggleCommand` would be formed first.
-
-Upon execution by `LogicManager`, the event `BrowserAndRemindersPanelToggleEvent` would be posted by the `EventCenter`, to the `EventBus`.
-
++
++
+As seen from the sequence diagram above, when the user type the command for toggle, an instance of `ToggleCommand` would be instantiated. Upon execution by `LogicManager`, the event `BrowserAndRemindersPanelToggleEvent` would be posted by the `EventCenter`, to the `EventBus`:
++
++
 [source, java]
 ----
 public class ToggleCommand extends Command {
@@ -597,16 +597,20 @@ public class ToggleCommand extends Command {
     }
 }
 ----
-
-The method `handleBrowserToggleEvent()` in the `BrowserAndRemindersPanel` class in the `UI` component will then listen for the event,
++
++
+As seen from the diagram below, the method `handleBrowserToggleEvent()` in the `BrowserAndRemindersPanel` class in the `UI` component will then listen for the event,
 and upon receiving the event, it will invoke the method `toggleBrowserPanel` to trigger the actual toggling.
-
++
++
 image::togglingMechanism3.png[width="790"]
 _Figure 23 : Sequence diagram for the second part of the toggling mechanism._
-
-The `BrowserAndRemindersPanel` class has a variable `currentlyInFront` keeping track of which panel (browser or reminders) is currently being shown (in front).
-`toggleBrowserPanel` would then use the `currentlyInFront` variable to toggle to the correct panel, and then update `currentlyInFront` appropriately. +
-
++
++
+The `BrowserAndRemindersPanel` class has a variable `currentlyInFront` keeping track of which panel (browser or reminders) is currently being shown.
+`toggleBrowserPanel` would then use the `currentlyInFront` variable to toggle to the correct panel, and then update `currentlyInFront` appropriately:
++
++
 [source, java]
 ----
 public class BrowserAndRemindersPanel extends UIPart<Region> {
@@ -634,13 +638,15 @@ public class BrowserAndRemindersPanel extends UIPart<Region> {
     }
 }
 ----
-
++
++
 As seen from the code snippet above, two other events `TurnLabelsOnEvent` and `TurnLabelsOffEvent` can still be raised.
 When the browser is being brought to the front, the *birthdays* and *reminders* heading just above the list of birthday reminders and
 reminders should be turned off. When the reminders panel is brought to the front, these heading should be turned on. The handling of these two events
 are in the `HeaderPane` class, where the variables `birthdays` and `reminders`, representing the `Label` header object for birthday reminders and reminders
-respectively, are turned on and off by simply setting their visibility appropriately.
-
+respectively, are turned on and off by simply setting their visibility appropriately:
++
++
 [source, java]
 ----
 public class HeaderPane extends UIPart<Region> {
@@ -659,9 +665,11 @@ public class HeaderPane extends UIPart<Region> {
     }
 }
 ----
-
-One important thing to note that when the `select` command is executed, the browser panel would be brought forward no matter what.
-
++
++
+One important thing to note that when the `select` command is executed, the browser panel would be brought forward no matter what:
++
++
 [source, java]
 ----
 public class BrowserAndRemindersPanel extends UIPart<Region> {
@@ -679,8 +687,9 @@ public class BrowserAndRemindersPanel extends UIPart<Region> {
     }
 }
 ----
-
-The `PersonPanelSelectionChangedEvent` is posted whenever the `select` command is executed. Within the `handlePersonPanelSelectionChangedEvent`
++
++
+As seen from the code snippet above, the `PersonPanelSelectionChangedEvent` is posted whenever the `select` command is executed. Within the `handlePersonPanelSelectionChangedEvent`
 method, there is the method `bringBrowserToFront`, which would then bring the browser panel to the front no matter what.
 
 ==== Design Considerations
