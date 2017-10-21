@@ -103,7 +103,7 @@ The *_Architecture Diagram_* given above explains the high-level design of the a
 [TIP]
 The `.pptx` files used to create diagrams in this document can be found in the link:{repoURL}/docs/diagrams/[diagrams] folder. To update a diagram, modify the diagram in the pptx file, select the objects of the diagram, and choose `Save as picture`.
 
-`Main` has only one class called link:{repoURL}/src/main/java/seedu/address/MainApp.java[`MainApp`], where it does the following:
+`Main` has only one class called link:{repoURL}/src/main/java/seedu/address/MainApp.java[`MainApp`], and it does the following:
 
 * At app launch: Initializes the components in the correct sequence, and connects them up with each other.
 * At shut down: Shuts down the components and invokes cleanup method where necessary.
