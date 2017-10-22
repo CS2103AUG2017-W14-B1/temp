@@ -191,7 +191,7 @@ link:{repoURL}/src/main/java/seedu/address/logic/Logic.java[`Logic.java`]
 *  The command execution can affect the `Model` (e.g. adding a person) and/or raise events.
 *  The result of the command execution is encapsulated as a `CommandResult` object which is passed back to the `Ui`.
 
-Given below is the Sequence Diagram for interactions within the `Logic` component for the `execute("delete 1")` API call.
+Given is the Sequence Diagram for interactions within the `Logic` component for the `execute("delete 1")` API call.
 
 image::DeletePersonSdForLogic.png[width="800"]
 _Figure 8 : Interactions inside the Logic component for the `delete 1` command_
@@ -319,7 +319,7 @@ The `ExportCommand` uses `XmlAddressBookStorage` class to generate a xml file ba
 
 The method `getRangefromInput()` splits the `String` range using the regex `","` and returns a `String` array for the different values in the `String` range.
 
-Below is an extract of the method `getRangefromInput()`.
+Below is an extract of the method `getRangefromInput()`:
 
 [source,java]
 ----
