@@ -16,7 +16,7 @@ By: `Team SE-EDU`      Since: `Jun 2016`      Licence: `MIT`
 
 == Introduction
 
-iContacts is an address book application with target audience as university students for managing contacts. The guide provides information for developers who wish to join our team as either developer or tester. This guide is intended to get you to understand the internal designs of the application, so that you will be able to work with the application quickly. The guide explains the design, implementation of noteworthy features, and the testing methods used in iContacts.
+iContacts is an address book application with target audience as university students for managing contacts. This guide provides information for developers who wish to join our team as either developer or tester, and is intended to get you to understand the internal designs of the application, so that you will be able to work with the application quickly. The guide explains the design, implementation of noteworthy features, and the testing methods used in iContacts.
 
 == Setting up
 
@@ -191,7 +191,7 @@ link:{repoURL}/src/main/java/seedu/address/logic/Logic.java[`Logic.java`]
 *  The command execution can affect the `Model` (e.g. adding a person) and/or raise events.
 *  The result of the command execution is encapsulated as a `CommandResult` object which is passed back to the `Ui`.
 
-Given is the Sequence Diagram for interactions within the `Logic` component for the `execute("delete 1")` API call.
+Given below is the Sequence Diagram for interactions within the `Logic` component for the `execute("delete 1")` API call.
 
 image::DeletePersonSdForLogic.png[width="800"]
 _Figure 8 : Interactions inside the Logic component for the `delete 1` command_
