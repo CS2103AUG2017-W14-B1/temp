@@ -16,7 +16,7 @@ By: `Team SE-EDU`      Since: `Jun 2016`      Licence: `MIT`
 
 == Introduction
 
-iContacts is an address book application for managing contacts. This guide is intended to get you to understand the internal designs of the application, so that you will be able to work with the application quickly. The guide explains the design, implementation of noteworthy features, and the testing methods used in iContacts.
+iContacts is an address book application with target audience as university students for managing contacts. The guide provides information for developers who wish to join our team as either developer or tester. This guide is intended to get you to understand the internal designs of the application, so that you will be able to work with the application quickly. The guide explains the design, implementation of noteworthy features, and the testing methods used in iContacts.
 
 == Setting up
 
@@ -98,40 +98,42 @@ This section will explain the design aspects of iContacts.
 image::Architecture.png[width="600"]
 _Figure 1 : Architecture Diagram_
 
-The *_Architecture Diagram_* given above explains the high-level design of the application. Below is a quick overview of each component:
+The *_Architecture Diagram_* given above explains the high-level design of the application.
 
 [TIP]
 The `.pptx` files used to create diagrams in this document can be found in the link:{repoURL}/docs/diagrams/[diagrams] folder. To update a diagram, modify the diagram in the pptx file, select the objects of the diagram, and choose `Save as picture`.
 
-`Main` has only one class called link:{repoURL}/src/main/java/seedu/address/MainApp.java[`MainApp`], and it does the following:
+Below is a quick overview of each component:
 
-* At app launch: Initializes the components in the correct sequence, and connects them up with each other.
-* At shut down: Shuts down the components and invokes cleanup method where necessary.
+* `Main` has only one class called link:{repoURL}/src/main/java/seedu/address/MainApp.java[`MainApp`], and it does the following:
 
-link:#common-classes[*`Commons`*] represents a collection of classes used by multiple other components. Two of those classes play important roles at the architecture level.
+** At app launch: Initializes the components in the correct sequence, and connects them up with each other.
+** At shut down: Shuts down the components and invokes cleanup method where necessary.
 
-* `EventsCenter` : This class (written using https://github.com/google/guava/wiki/EventBusExplained[Google's Event Bus library]) is used by components to communicate with other components using events (i.e. a form of _Event Driven_ design)
-* `LogsCenter` : Used by many classes to write log messages to the App's log file.
+* link:#common-classes[*`Commons`*] represents a collection of classes used by multiple other components. Two of those classes play important roles at the architecture level.
 
-The rest of the App consists of four components:
+** `EventsCenter` : This class (written using https://github.com/google/guava/wiki/EventBusExplained[Google's Event Bus library]) is used by components to communicate with other components using events (i.e. a form of _Event Driven_ design)
+** `LogsCenter` : Used by many classes to write log messages to the App's log file.
 
-* link:#ui-component[*`UI`*] : The UI of the App.
-* link:#logic-component[*`Logic`*] : The command executor.
-* link:#model-component[*`Model`*] : Holds the data of the App in-memory.
-* link:#storage-component[*`Storage`*] : Reads data from, and writes data to, the hard disk.
+* The rest of the App consists of four components:
 
-Each of the four components
+** link:#ui-component[*`UI`*] : The UI of the App.
+** link:#logic-component[*`Logic`*] : The command executor.
+** link:#model-component[*`Model`*] : Holds the data of the App in-memory.
+** link:#storage-component[*`Storage`*] : Reads data from, and writes data to, the hard disk.
 
-* defines its _API_ in an `interface` with the same name as the Component.
-* exposes its functionality using a `{Component Name}Manager` class.
+Each of the four components:
+
+*** defines its _API_ in an `interface` with the same name as the Component.
+*** exposes its functionality using a `{Component Name}Manager` class.
 
 For example, the `Logic` component (see the class diagram given below) defines it's API in the `Logic.java` interface and exposes its functionality using the `LogicManager.java` class.
 
 image::LogicClassDiagram.png[width="800"]
 _Figure 2 : Class Diagram of the Logic Component_
 
-[discrete]
-==== Events-Driven nature of the design
+
+=== Events-Driven nature of the design
 
 The _Sequence Diagram_ below shows how the components interact for the scenario where the user issues the command `delete 1`.
 
@@ -155,6 +157,8 @@ This section explains the four components used in the App.
 
 ==== UI component
 
+UI component provides with the API of Graphical User Interface. The figure below shows the structure of the UI component.
+
 image::UiClassDiagram.png[width="800"]
 _Figure 5 : Structure of the UI component_
 
@@ -171,6 +175,7 @@ The `UI` component
 * responds to events raised from various parts of the App and updates the UI accordingly.
 
 ==== Logic component
+Logic component deals with how each command and its parser would be executed in an event-driven design. The figures below show the structure of the Logic component.
 
 image::LogicClassDiagram.png[width="800"]
 _Figure 6 : Structure of the Logic component_
@@ -192,6 +197,8 @@ image::DeletePersonSdForLogic.png[width="800"]
 _Figure 8 : Interactions inside the Logic component for the `delete 1` command_
 
 ==== Model component
+Model Component handles the contacts in address book and all it's stored details in data structures which provides API to create, read, update and delete the contacts in address book. The figure below shows the structure of Model component.
+
 
 image::ModelClassDiagram.png[width="800"]
 _Figure 9 : Structure of the Model component_
@@ -206,6 +213,7 @@ The `Model`
 * does not depend on any of the other three components.
 
 ==== Storage component
+The storage component handles the storage of all data of address book in the local device. The figure below shows the structure of Storage component.
 
 image::StorageClassDiagram.png[width="800"]
 _Figure 10 : Structure of the Storage component_
@@ -549,7 +557,7 @@ The command is implemented in this manner because of the following reasons:
 * By specifying the index, there is no ambiguity as to who should be assigned the display picture.
 * The `PATHOFIMAGE` must be an absolute path on the local device to make sure the image is referenced.
 * The image is stored in directory with a unique name to avoid conflict. Hashcode of user's email address is used to maintain uniqueness.
-* The task is done using CLI and follows as NFR.
+* The task is done using CLI to follow project requirements.
 * The image is stored in jpg format to ensure maximum compatibility.
 
 ==== Design Considerations
@@ -574,19 +582,19 @@ The command is implemented in this manner because of the following reasons:
 
 
 === Toggling mechanism
+The toggling mechanism is an event-driven mechanism.
 
 image::togglingMechanism1.png[width="790]
 _Figure 21 : Component interactions for the toggling mechanism._
 
-The toggling mechanism is an event-driven mechanism. The above diagram shows the high-level overview of the component interactions for the toggling mechanism. +
+The above diagram shows the high-level overview of the component interactions for the toggling mechanism. +
 
 image::togglingMechanism2.png[width="790"]
 _Figure 22 : Sequence diagram for the first part of the toggling mechanism._
-+
-+
+
 As seen from the sequence diagram above, when the user type the command for toggle, an instance of `ToggleCommand` would be instantiated. Upon execution by `LogicManager`, the event `BrowserAndRemindersPanelToggleEvent` would be posted by the `EventCenter`, to the `EventBus`:
-+
-+
+
+
 [source, java]
 ----
 public class ToggleCommand extends Command {
@@ -597,20 +605,17 @@ public class ToggleCommand extends Command {
     }
 }
 ----
-+
-+
+
+
 As seen from the diagram below, the method `handleBrowserToggleEvent()` in the `BrowserAndRemindersPanel` class in the `UI` component will then listen for the event,
 and upon receiving the event, it will invoke the method `toggleBrowserPanel` to trigger the actual toggling.
-+
-+
+
 image::togglingMechanism3.png[width="790"]
 _Figure 23 : Sequence diagram for the second part of the toggling mechanism._
-+
-+
+
 The `BrowserAndRemindersPanel` class has a variable `currentlyInFront` keeping track of which panel (browser or reminders) is currently being shown.
 `toggleBrowserPanel` would then use the `currentlyInFront` variable to toggle to the correct panel, and then update `currentlyInFront` appropriately:
-+
-+
+
 [source, java]
 ----
 public class BrowserAndRemindersPanel extends UIPart<Region> {
@@ -638,15 +643,13 @@ public class BrowserAndRemindersPanel extends UIPart<Region> {
     }
 }
 ----
-+
-+
+
 As seen from the code snippet above, two other events `TurnLabelsOnEvent` and `TurnLabelsOffEvent` can still be raised.
 When the browser is being brought to the front, the *birthdays* and *reminders* heading just above the list of birthday reminders and
 reminders should be turned off. When the reminders panel is brought to the front, these heading should be turned on. The handling of these two events
 are in the `HeaderPane` class, where the variables `birthdays` and `reminders`, representing the `Label` header object for birthday reminders and reminders
 respectively, are turned on and off by simply setting their visibility appropriately:
-+
-+
+
 [source, java]
 ----
 public class HeaderPane extends UIPart<Region> {
@@ -665,11 +668,9 @@ public class HeaderPane extends UIPart<Region> {
     }
 }
 ----
-+
-+
+
 One important thing to note that when the `select` command is executed, the browser panel would be brought forward no matter what:
-+
-+
+
 [source, java]
 ----
 public class BrowserAndRemindersPanel extends UIPart<Region> {
@@ -687,11 +688,10 @@ public class BrowserAndRemindersPanel extends UIPart<Region> {
     }
 }
 ----
-+
-+
+
 As seen from the code snippet above, the `PersonPanelSelectionChangedEvent` is posted whenever the `select` command is executed. Within the `handlePersonPanelSelectionChangedEvent`
 method, there is the method `bringBrowserToFront`, which would then bring the browser panel to the front no matter what.
-
+[discrete]
 ==== Design Considerations
 
 **Aspect:** Usage of browser area. +
@@ -760,15 +760,15 @@ To run tests in headless mode, open a console and run the command `gradlew clean
 
 We have two types of tests:
 
-.  *GUI Tests* - These are tests involving the GUI. They include,
-.. _System Tests_ that test the entire App by simulating user actions on the GUI. These are in the `systemtests` package.
-.. _Unit tests_ that test the individual components. These are in `seedu.address.ui` package.
-.  *Non-GUI Tests* - These are tests not involving the GUI. They include,
-..  _Unit tests_ targeting the lowest level methods/classes. +
+*  *GUI Tests* - These are tests involving the GUI. They include,
+** _System Tests_ that test the entire App by simulating user actions on the GUI. These are in the `systemtests` package.
+** _Unit tests_ that test the individual components. These are in `seedu.address.ui` package.
+*  *Non-GUI Tests* - These are tests not involving the GUI. They include,
+**  _Unit tests_ targeting the lowest level methods/classes. +
 e.g. `seedu.address.commons.StringUtilTest`
-..  _Integration tests_ that are checking the integration of multiple code units (those code units are assumed to be working). +
+**  _Integration tests_ that are checking the integration of multiple code units (those code units are assumed to be working). +
 e.g. `seedu.address.storage.StorageManagerTest`
-..  Hybrids of unit and integration tests. These test are checking multiple code units as well as how the are connected together. +
+**  Hybrids of unit and integration tests. These test are checking multiple code units as well as how the are connected together. +
 e.g. `seedu.address.logic.LogicManagerTest`
 
 
