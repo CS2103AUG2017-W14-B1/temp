@@ -608,7 +608,7 @@ The command is implemented in this manner because of the following reasons:
 The location command through an event-driven mechanism. The below diagram shows sequence diagram for it.
 
 image::locationSD.PNG[width="790"]
-_Figure 21 : Sequence diagram for the Location Command.
+_Figure 21 : Sequence diagram for the Location Command._
 
 The execution of command raises an event `ShowLocationEvent`. This causes the `BrowserAndReminderPanel` to switch to Node `Browser` irrespective of current state of the application.
 Following is the code written to ensure the GUI set up for the command.
@@ -668,14 +668,14 @@ The only two services offered are `gmail` and `outlook` as our target users are 
 The email command through an event driven mechanism. The below diagram shows sequence diagram for it.
 
 image::emailSD.PNG[width="790"]
-_Figure 22 : Sequence diagram for the Email Command.
+_Figure 22 : Sequence diagram for the Email Command._
 
 The given command is parsed to know the `Service` , `tag` to which email has to be sent, `Subject` and `Body`.
 
 The parsing takes place in the following manner:
 
 image::ParserSDEmail.PNG[width="790"]
-_Figure 23 : Sequence diagram for parsing the Email Command
+_Figure 23 : Sequence diagram for parsing the Email Command._
 
 
 The execution of command raises an event `SendingEmailEvent`.
