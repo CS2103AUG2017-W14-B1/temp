@@ -231,7 +231,7 @@ Classes used by multiple components are in the `seedu.addressbook.commons` packa
 
 == Implementation
 
-This section describes some noteworthy details on how certain features are implemented.
+This section describes some noteworthy details on how certain features are implemented, as well as design considerations for some features.
 
 // tag::filter[]
 === Filter mechanism
@@ -240,7 +240,8 @@ The `FilterCommand` uses `NameAndTagsContainsKeywordsPredicate` to filter the pe
 
 [source,java]
 ----
-public NameAndTagsContainsKeywordsPredicate(List<String> nameKeywords, List<String> tagKeywords) {
+public class NameAndTagsContainsKeywordsPredicate {
+    public NameAndTagsContainsKeywordsPredicate(List<String> nameKeywords, List<String> tagKeywords) {
         this.nameKeywords = nameKeywords;
         this.tagKeywords = tagKeywords;
     }
@@ -249,27 +250,24 @@ public NameAndTagsContainsKeywordsPredicate(List<String> nameKeywords, List<Stri
 
 The method `test(ReadOnlyPerson person)` iterates through `nameKeywords` and `tagKeywords` to find a match of every `person` from the address book.
 
-Below is an extract of the method `test(ReadOnlyPerson person`. The tags of each person are retrieved by the `getTags()` method. This method iterates through `tagKeywords` and counts the number of matches against `tagsOfPerson`. If the count is equal to the size of `tagKeywords`, this means all the keywords in `tagKeywords` matches. The `tagFound` will then be set to `true`.
+Below is an extract of the method `test(ReadOnlyPerson person)`. The tags of each person are retrieved by the `getTags()` method. This method iterates through `tagKeywords` and counts the number of matches against `tagsOfPerson`. If the count is equal to the size of `tagKeywords`, this means all the keywords in `tagKeywords` matches. The `tagFound` will then be set to `true`.
 
 [source,java]
 ----
-boolean tagFound = false;
+public class NameAndTagsContainsKeywordsPredicate {
+    @Override
+    public boolean test(ReadOnlyPerson person) {
+        boolean tagFound = false;
 
-int numTagKeywords = tagKeywords.size();
-int tagsMatchedCount = 0;
-
-if (!tagKeywords.isEmpty()) {
-    Set<Tag> tagsOfPerson = person.getTags();
-    for (Tag personTag : tagsOfPerson) {
-        for (String findTag : tagKeywords) {
-            if (personTag.tagName.equalsIgnoreCase(findTag)) {
-                tagsMatchedCount++;
-            }
+        int numTagKeywords = tagKeywords.size();
+        int tagsMatchedCount = 0;
+        if (!tagKeywords.isEmpty()) {
+            tagsMatchedCount = countTagMatches(person);
         }
-    }
 
-    if (tagsMatchedCount == numTagKeywords) {
-        tagFound = true;
+        if (tagsMatchedCount == numTagKeywords) {
+            tagFound = true;
+        }
     }
 }
 ----
@@ -278,26 +276,20 @@ Below is an extract of the same method for name. Each keywords in `nameKeywords`
 
 [source,java]
 ----
-boolean nameFound = false;
-    if (!nameKeywords.isEmpty()) {
-        nameFound = nameKeywords.stream().anyMatch(nameKeywords -> StringUtil
-        .containsWordIgnoreCase(person.getName().fullName, nameKeywords));
+public class NameAndTagsContainsKeywordsPredicate {
+    @Override
+    public boolean test(ReadOnlyPerson person) {
+        boolean nameFound = false;
+            if (!nameKeywords.isEmpty()) {
+                nameFound = nameKeywords.stream().anyMatch(nameKeywords -> StringUtil
+                .containsWordIgnoreCase(person.getName().fullName, nameKeywords));
+        }
+    }
 }
 ----
 
-For the `FilterCommand` to work properly, either `nameKeywords` or `tagKeywords` must be non-empty. The code extract from the same method below takes care of all four possibilities:
+For the `FilterCommand` to work properly, either `nameKeywords` or `tagKeywords` must be non-empty.
 
-----
-if (nameKeywords.isEmpty() && tagKeywords.isEmpty()) {
-    throw new AssertionError("Either name or tag must be non-empty");
-    } else if (nameKeywords.isEmpty()) {
-        return tagFound;
-    } else if (tagKeywords.isEmpty()) {
-        return nameFound;
-    }
-
-return nameFound && tagFound;
-----
 // end::filter[]
 
 // tag::export[]
@@ -307,6 +299,7 @@ The `ExportCommand` uses `XmlAddressBookStorage` class to generate a xml file ba
 
 [source,java]
 ----
+public class ExportCommand extends Command {
     public ExportCommand(String range, String path) {
         requireNonNull(range);
         requireNonNull(path);
@@ -315,22 +308,27 @@ The `ExportCommand` uses `XmlAddressBookStorage` class to generate a xml file ba
         this.path = path;
         exportBook = new AddressBook();
     }
+}
 ----
 
-The method `getRangefromInput()` splits the `String` range using the regex `","` and returns a `String` array for the different values in the `String` range.
+The method `getRangefromInput()` splits the String range using a seperator and returns a String array for the different values in the String range.
 
 Below is an extract of the method `getRangefromInput()`:
 
 [source,java]
 ----
-private String[] getRangeFromInput() {
-        String[] splitStringComma = this.range.split(",");
+public class ExportCommand extends Command {
+    private String[] getRangeFromInput() {
+        private String[] getRangeFromInput() {
+            String[] splitStringComma = this.range.split(",");
 
-        return splitStringComma;
+            return splitStringComma;
+        }
     }
+}
 ----
 
-To determine which contacts should be added to the `exportBook` we have to check the the user input, there are three cases:
+To determine which contacts should be added to the exportBook we have to check the the user input. There are three cases:
 
 * All (Priority)
 ** if the word `all` is present in the user input, we will just export all the contacts in the last shown list.
@@ -340,9 +338,14 @@ To determine which contacts should be added to the `exportBook` we have to check
 ** if the user input contains a range which is identified by `-` character, we will add that range of index (one-based) to the `exportBook`.
 
 Below is the code snippet to identify the three cases in the user input:
+
 [source,java]
 ----
-String[] multipleRange = getRangeFromInput();
+public class ExportCommand extends Command {
+
+    @Override
+    public CommandResult execute() throws CommandException {
+        String[] multipleRange = getRangeFromInput();
 
         if (multipleRange[0].equals("all")) {
             exportAll();
@@ -356,6 +359,9 @@ String[] multipleRange = getRangeFromInput();
                 }
             }
         }
+        /... storage is resolved here ...
+    }
+}
 ----
 
 The final step is to create the xml file from the `exportBook`.
@@ -363,13 +369,21 @@ The final step is to create the xml file from the `exportBook`.
 Below is the code snippet to export the data into an xml file using `AddressBookStorage`.
 [source,java]
 ----
-try {
+public class ExportCommand extends Command {
+    @Override
+    public CommandResult execute() throws CommandException {
+
+    /... the exporting is resolved here ...
+
+        try {
             AddressBookStorage storage = new XmlAddressBookStorage(path + ".xml");
             storage.saveAddressBook(exportBook);
         } catch (IOException ioe) {
             return new CommandResult(MESSAGE_EXPORT_FAIL);
         }
         return new CommandResult(MESSAGE_EXPORT_SUCCESS);
+    }
+}
 ----
 // end::export[]
 
@@ -526,28 +540,37 @@ _Figure 19 : Sequence Diagram for Display Picture Command._
 
 The wireframe used to display the image for each person is shown below:
 
-image::WireFramePersonCard.PNG[width="800"]
-_Figure 20 : Wireframe for the UI._
+image::WireFramePersonCard.PNG[width="500"]
+_Figure 2: Wireframe for the UI._
 
 
 The binder for refreshing the image every time the picture is updated is implemented by the following function:
 
 [source,java]
 ----
+public class PersonCard extends UiPart<Region> {
     private void assignImage(ReadOnlyPerson person) {
-            // ... assigning image logic ...
-            displayPicture.setImage(image);
-        }
+        // ... assigning image logic ...
+        displayPicture.setImage(image);
+    }
+}
 ----
 
 The new image stored in directory is given a unique name which is formed using hashcode of the unique email address of each contact:
 
 [source,java]
 ----
-    ReadAndStoreImage readAndStoreImage = new ReadAndStoreImage();
+public class DisplayPictureCommand extends UndoableCommand {
 
-    displayPicture.setPath(readAndStoreImage.execute(displayPicture.getPath(),
-                        personToEdit.getEmail().hashCode())); // image name formed in this line
+    @Override
+    public CommandResult executeUndoableCommand() throws CommandException, IOException, URISyntaxException {
+        /...
+        ReadAndStoreImage readAndStoreImage = new ReadAndStoreImage();
+
+        displayPicture.setPath(readAndStoreImage.execute(displayPicture.getPath(),
+                            personToEdit.getEmail().hashCode())); // image name formed in this line
+    }
+}
 ----
 
 ==== Reason for this type of implementation
@@ -579,6 +602,102 @@ The command is implemented in this manner because of the following reasons:
 **Alternative 2:** Pop up a `FileChooser` after command is entered. +
 **Pros:** Easier for users to mention the correct image quickly. +
 **Cons:** Will no longer be a CLI process completely.
+
+=== Location Mechanism
+The location command through an event driven mechanism. The below diagram shows sequence diagram for it.
+
+image::locationSD.PNG[width="790"]
+
+The execution of command raises an event `ShowLocationEvent`. This causes the `BrowserAndReminderPanel` to switch to Node `Browser` irrespective of current state of the application.
+Following is the code written to ensure the GUI set up for the command.
+
+[source, java]
+----
+private void setUpToShowLocation() {
+    if (currentlyInFront == Node.REMINDERS) {
+        browser.toFront();
+        currentlyInFront = Node.BROWSER;
+        raise(new TurnLabelsOffEvent());
+    }
+}
+----
+
+The URL for denoting the specified person's address in Google Maps is set up through the following code
+
+[source, java]
+----
+public String loadPersonLocation(String address) {
+
+        String[] splitAddressByWords = address.split("\\s");
+
+        String keywordsOfUrl = "";
+
+        for (String word: splitAddressByWords) {
+            keywordsOfUrl += word;
+            keywordsOfUrl += "+";
+        }
+
+        loadPage(GOOGLE_MAPS_URL + keywordsOfUrl);
+}
+----
+
+
+
+==== Design Considerations
+
+**Aspect:** What to use to show the location +
+**Alternative 1 (current choice):** Show using google maps url in BrowserPanel  +
+**Pros:** We will be able to get the location easily with accuracy +
+**Cons:** Limited functionality of URL +
+**Alternative 2:** Google Maps API +
+**Pros:**  Allows more functionality +
+**Cons:** Uses more resources for the exact same feature and doesn't utilise pre existing browser properly
+
+
+=== Email Mechanism
+
+The email command lets the user compose an email in default browser with filled in data like recipients, subject and body.
+
+[NOTE]
+The recipients are all contacts belonging to a particular tag.
+[NOTE]
+The only two services offered are `gmail` and `outlook` as our target users are students.
+
+The email command through an event driven mechanism. The below diagram shows sequence diagram for it.
+
+image::emailSD.PNG[width="790"]
+
+The given command is parsed to know the `Service` , `tag` to which email has to be sent, `Subject` and `Body`.
+
+The parsing takes place in the following manner:
+
+image::ParserSDEmail.PNG[width="790"]
+
+
+The execution of command raises an event `SendingEmailEvent`.
+
+The URL for composing the mail set up through the following code
+
+[source, java]
+----
+public static final String GMAIL_EMAIL_URL =
+            "https://mail.google.com/mail/?view=cm&fs=1&tf=1&source=mailto&to=%1$s&su=%2$s&body=%3$s";
+
+public static final String OUTLOOK_EMAIL_URL =
+            "https://outlook.office.com/?path=/mail/action/compose&to=%1$s&subject=%2$s&body=%3$s";
+
+Desktop.getDesktop().browse(new URI(String.format(GMAIL_EMAIL_URL, recipients, subject, body)));
+----
+
+==== Design Considerations
+
+**Aspect:** Where to compose the mail +
+**Alternative 1 (current choice):** Opens the default browser of Desktop  +
+**Pros:** The browser has user already signed up and browser supports the url +
+**Cons:** Depending on third party apps +
+**Alternative 2:** Open in `BrowserPanel` +
+**Pros:** No dependency on other apps +
+**Cons:** Does not auto fill in the text due to older version of browser
 
 
 === Toggling mechanism
@@ -691,6 +810,25 @@ public class BrowserAndRemindersPanel extends UIPart<Region> {
 
 As seen from the code snippet above, the `PersonPanelSelectionChangedEvent` is posted whenever the `select` command is executed. Within the `handlePersonPanelSelectionChangedEvent`
 method, there is the method `bringBrowserToFront`, which would then bring the browser panel to the front no matter what.
+
+=== Reminder Implementation
+image::RemindersUML.png[width="790"]
+_Figure 1: UML diagram showing the implementation of reminders_
+
+The `Reminder` object represents a reminder in iContacts. It contains a `String` object `reminder`, which represents
+the actual reminder from the user, and also a `DueDate` object which represents the date and time for the reminder. +
+
+In terms of how `Reminder` objects are kept in-memory during the execution of the program, `Reminder` objects are
+kept within `UniqueReminderList`, which assures that there are no duplicate `Reminder` objects. The `UniqueReminderList`
+object is then used by `ModelManager` to carry out commands related to reminders. +
+
+`Reminder` objects are stored in a XML storage file in a JAXB-friendly version `XmlAdaptedReminder`. +
+When the program starts, `XmlAdaptedReminder` objects are read in as `XmlSerializableReminders`. The `XmlSerializableReminders`
+object is then passed to `UniqueReminderList`, which then converts it into a list of `Reminder` objects for in-memory use. +
+
+To save, the `saveReminders` method in `StorageManager` is called, which trickles down to `XmlRemindersStorage` and eventually
+calls the `saveRemindersToFile` method in `XmlUtil`.
+
 [discrete]
 ==== Design Considerations
 
@@ -709,6 +847,35 @@ Cons: More difficult to implement +
 **Alternative 2:** Set the visibility of browser as required (set the browser visibility to false to display reminders and vice versa). +
 Pros: Easier to implement. +
 Cons: Users cannot interact with the reminders panel (since the browser is technically still in front).
+
+// tag::theme[]
+=== Theme-changing mechanism
+
+image::themeChangingMechanism1.png[width="790"]
+_Figure 1 : Component interactions for the theme-changing mechanism_
+
+The theme-changing mechanism is an event-driven mechanism. The above diagram shows the high-level overview of the component interactions for the theme-changing mechanism.
+
+image::themeChangingMechanism2.png[width="790"]
+_Figure 2 : Sequence diagram for the first part of the theme-changing mechanism_
+
+As shown from the sequence diagram above, after the user entered the command `theme sky`, a new object `ThemeCommand` will be created. The `LogicManager` will then execute `ThemeCommand`, and the event `ChangeThemeRequestEvent` will be posted by `EventsCenter`. The code snippet below shows the `execute()` method of `ThemeCommand`:
+
+----
+public class ThemeCommand extends Command {
+    @Override
+    public CommandResult execute() {
+        EventsCenter.getInstance().post(new ChangeThemeRequestEvent(theme));
+        return new CommandResult(String.format(MESSAGE_SET_THEME_SUCCESS, theme.getTheme()));
+    }
+}
+----
+
+image::themeChangingMechanism3.png[width="790"]
+_Figure 3 : Sequence diagram for the second part of the theme-changing mechanism_
+
+As shown from the sequence diagram above, the method `handleChangeThemeEvent()` in `MainWindow` will handle the event and change the theme of the address book through the method `changeTheme()` accordingly.
+// end::theme[]
 
 === Logging
 
