@@ -480,6 +480,7 @@ The following activity diagram summarize what happens inside the `UndoRedoStack`
 image::UndoRedoActivityDiagram.png[width="200"]
 _Figure 18 : Activity diagram for UndoRedoStack_
 
+[discrete]
 ==== Design Considerations
 
 **Aspect:** Implementation of `UndoableCommand` +
@@ -541,7 +542,7 @@ _Figure 19 : Sequence Diagram for Display Picture Command._
 The wireframe used to display the image for each person is shown below:
 
 image::WireFramePersonCard.PNG[width="500"]
-_Figure 2: Wireframe for the UI._
+_Figure 20 : Wireframe for the UI._
 
 
 The binder for refreshing the image every time the picture is updated is implemented by the following function:
@@ -604,9 +605,10 @@ The command is implemented in this manner because of the following reasons:
 **Cons:** Will no longer be a CLI process completely.
 
 === Location Mechanism
-The location command through an event driven mechanism. The below diagram shows sequence diagram for it.
+The location command through an event-driven mechanism. The below diagram shows sequence diagram for it.
 
 image::locationSD.PNG[width="790"]
+_Figure 21 : Sequence diagram for the Location Command.
 
 The execution of command raises an event `ShowLocationEvent`. This causes the `BrowserAndReminderPanel` to switch to Node `Browser` irrespective of current state of the application.
 Following is the code written to ensure the GUI set up for the command.
@@ -642,7 +644,7 @@ public String loadPersonLocation(String address) {
 ----
 
 
-
+[discrete]
 ==== Design Considerations
 
 **Aspect:** What to use to show the location +
@@ -666,12 +668,14 @@ The only two services offered are `gmail` and `outlook` as our target users are 
 The email command through an event driven mechanism. The below diagram shows sequence diagram for it.
 
 image::emailSD.PNG[width="790"]
+_Figure 22 : Sequence diagram for the Email Command.
 
 The given command is parsed to know the `Service` , `tag` to which email has to be sent, `Subject` and `Body`.
 
 The parsing takes place in the following manner:
 
 image::ParserSDEmail.PNG[width="790"]
+_Figure 23 : Sequence diagram for parsing the Email Command
 
 
 The execution of command raises an event `SendingEmailEvent`.
@@ -689,6 +693,7 @@ public static final String OUTLOOK_EMAIL_URL =
 Desktop.getDesktop().browse(new URI(String.format(GMAIL_EMAIL_URL, recipients, subject, body)));
 ----
 
+[discrete]
 ==== Design Considerations
 
 **Aspect:** Where to compose the mail +
@@ -704,12 +709,12 @@ Desktop.getDesktop().browse(new URI(String.format(GMAIL_EMAIL_URL, recipients, s
 The toggling mechanism is an event-driven mechanism.
 
 image::togglingMechanism1.png[width="790]
-_Figure 21 : Component interactions for the toggling mechanism._
+_Figure 24 : Component interactions for the toggling mechanism._
 
 The above diagram shows the high-level overview of the component interactions for the toggling mechanism. +
 
 image::togglingMechanism2.png[width="790"]
-_Figure 22 : Sequence diagram for the first part of the toggling mechanism._
+_Figure 25 : Sequence diagram for the first part of the toggling mechanism._
 
 As seen from the sequence diagram above, when the user type the command for toggle, an instance of `ToggleCommand` would be instantiated. Upon execution by `LogicManager`, the event `BrowserAndRemindersPanelToggleEvent` would be posted by the `EventCenter`, to the `EventBus`:
 
@@ -730,7 +735,7 @@ As seen from the diagram below, the method `handleBrowserToggleEvent()` in the `
 and upon receiving the event, it will invoke the method `toggleBrowserPanel` to trigger the actual toggling.
 
 image::togglingMechanism3.png[width="790"]
-_Figure 23 : Sequence diagram for the second part of the toggling mechanism._
+_Figure 26 : Sequence diagram for the second part of the toggling mechanism._
 
 The `BrowserAndRemindersPanel` class has a variable `currentlyInFront` keeping track of which panel (browser or reminders) is currently being shown.
 `toggleBrowserPanel` would then use the `currentlyInFront` variable to toggle to the correct panel, and then update `currentlyInFront` appropriately:
@@ -813,7 +818,7 @@ method, there is the method `bringBrowserToFront`, which would then bring the br
 
 === Reminder Implementation
 image::RemindersUML.png[width="790"]
-_Figure 1: UML diagram showing the implementation of reminders_
+_Figure 27: UML diagram showing the implementation of reminders_
 
 The `Reminder` object represents a reminder in iContacts. It contains a `String` object `reminder`, which represents
 the actual reminder from the user, and also a `DueDate` object which represents the date and time for the reminder. +
@@ -852,12 +857,12 @@ Cons: Users cannot interact with the reminders panel (since the browser is techn
 === Theme-changing mechanism
 
 image::themeChangingMechanism1.png[width="790"]
-_Figure 1 : Component interactions for the theme-changing mechanism_
+_Figure 28 : Component interactions for the theme-changing mechanism_
 
 The theme-changing mechanism is an event-driven mechanism. The above diagram shows the high-level overview of the component interactions for the theme-changing mechanism.
 
 image::themeChangingMechanism2.png[width="790"]
-_Figure 2 : Sequence diagram for the first part of the theme-changing mechanism_
+_Figure 29 : Sequence diagram for the first part of the theme-changing mechanism_
 
 As shown from the sequence diagram above, after the user entered the command `theme sky`, a new object `ThemeCommand` will be created. The `LogicManager` will then execute `ThemeCommand`, and the event `ChangeThemeRequestEvent` will be posted by `EventsCenter`. The code snippet below shows the `execute()` method of `ThemeCommand`:
 
@@ -872,7 +877,7 @@ public class ThemeCommand extends Command {
 ----
 
 image::themeChangingMechanism3.png[width="790"]
-_Figure 3 : Sequence diagram for the second part of the theme-changing mechanism_
+_Figure 30 : Sequence diagram for the second part of the theme-changing mechanism_
 
 As shown from the sequence diagram above, the method `handleChangeThemeEvent()` in `MainWindow` will handle the event and change the theme of the address book through the method `changeTheme()` accordingly.
 // end::theme[]
