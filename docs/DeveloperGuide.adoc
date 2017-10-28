@@ -59,6 +59,9 @@ This will generate all the resources required by the application and tests.
 
 === Configurations to do before writing code
 
+The following configurations need to be done before a developer starts writing the code. This is done to ensure that
+the java coding styles and practices are followed.
+
 ==== Configuring the coding style
 
 This project follows https://github.com/oss-generic/process/blob/master/docs/CodingStandards.md[oss-generic coding standards]. IntelliJ's default style is mostly compliant with ours but it uses a different import order from ours. Here are the steps to rectify the order:
@@ -565,7 +568,7 @@ public class DisplayPictureCommand extends UndoableCommand {
 
     @Override
     public CommandResult executeUndoableCommand() throws CommandException, IOException, URISyntaxException {
-        /...
+        /... executes function of ReadAndStoreImage ...
         ReadAndStoreImage readAndStoreImage = new ReadAndStoreImage();
 
         displayPicture.setPath(readAndStoreImage.execute(displayPicture.getPath(),
@@ -573,8 +576,6 @@ public class DisplayPictureCommand extends UndoableCommand {
     }
 }
 ----
-
-==== Reason for this type of implementation
 
 The command is implemented in this manner because of the following reasons:
 
@@ -584,6 +585,7 @@ The command is implemented in this manner because of the following reasons:
 * The task is done using CLI to follow project requirements.
 * The image is stored in jpg format to ensure maximum compatibility.
 
+[discrete]
 ==== Design Considerations
 
 **Aspect:** At what stage should the image be read and stored +
@@ -604,13 +606,17 @@ The command is implemented in this manner because of the following reasons:
 **Pros:** Easier for users to mention the correct image quickly. +
 **Cons:** Will no longer be a CLI process completely.
 
-=== Location Mechanism
+=== Location mechanism
 The location command through an event-driven mechanism. The below diagram shows sequence diagram for it.
 
 image::locationSD.PNG[width="790"]
 _Figure 21 : Sequence diagram for the Location Command._
 
-The execution of command raises an event `ShowLocationEvent`. This causes the `BrowserAndReminderPanel` to switch to Node `Browser` irrespective of current state of the application.
+The execution of command raises an event `ShowLocationEvent`. This causes the `BrowserAndReminderPanel` to switch to Node `Browser` irrespective of current state of the application. The activity diagram for such a case is shown below:
+
+image::locationAD.PNG[width="790"]
+_Figure 22 : Sequence diagram for the Location Command._
+
 Following is the code written to ensure the GUI set up for the command.
 
 [source, java]
@@ -656,7 +662,7 @@ public String loadPersonLocation(String address) {
 **Cons:** Uses more resources for the exact same feature and doesn't utilise pre existing browser properly
 
 
-=== Email Mechanism
+=== Email mechanism
 
 The email command lets the user compose an email in default browser with filled in data like recipients, subject and body.
 
@@ -668,14 +674,14 @@ The only two services offered are `gmail` and `outlook` as our target users are 
 The email command through an event driven mechanism. The below diagram shows sequence diagram for it.
 
 image::emailSD.PNG[width="790"]
-_Figure 22 : Sequence diagram for the Email Command._
+_Figure 23 : Sequence diagram for the Email Command._
 
 The given command is parsed to know the `Service` , `tag` to which email has to be sent, `Subject` and `Body`.
 
 The parsing takes place in the following manner:
 
 image::ParserSDEmail.PNG[width="790"]
-_Figure 23 : Sequence diagram for parsing the Email Command._
+_Figure 24 : Sequence diagram for parsing the Email Command._
 
 
 The execution of command raises an event `SendingEmailEvent`.
@@ -709,12 +715,12 @@ Desktop.getDesktop().browse(new URI(String.format(GMAIL_EMAIL_URL, recipients, s
 The toggling mechanism is an event-driven mechanism.
 
 image::togglingMechanism1.png[width="790]
-_Figure 24 : Component interactions for the toggling mechanism._
+_Figure 25 : Component interactions for the toggling mechanism._
 
 The above diagram shows the high-level overview of the component interactions for the toggling mechanism. +
 
 image::togglingMechanism2.png[width="790"]
-_Figure 25 : Sequence diagram for the first part of the toggling mechanism._
+_Figure 26 : Sequence diagram for the first part of the toggling mechanism._
 
 As seen from the sequence diagram above, when the user type the command for toggle, an instance of `ToggleCommand` would be instantiated. Upon execution by `LogicManager`, the event `BrowserAndRemindersPanelToggleEvent` would be posted by the `EventCenter`, to the `EventBus`:
 
@@ -735,7 +741,7 @@ As seen from the diagram below, the method `handleBrowserToggleEvent()` in the `
 and upon receiving the event, it will invoke the method `toggleBrowserPanel` to trigger the actual toggling.
 
 image::togglingMechanism3.png[width="790"]
-_Figure 26 : Sequence diagram for the second part of the toggling mechanism._
+_Figure 27 : Sequence diagram for the second part of the toggling mechanism._
 
 The `BrowserAndRemindersPanel` class has a variable `currentlyInFront` keeping track of which panel (browser or reminders) is currently being shown.
 `toggleBrowserPanel` would then use the `currentlyInFront` variable to toggle to the correct panel, and then update `currentlyInFront` appropriately:
@@ -818,7 +824,7 @@ method, there is the method `bringBrowserToFront`, which would then bring the br
 
 === Reminder Implementation
 image::RemindersUML.png[width="790"]
-_Figure 27: UML diagram showing the implementation of reminders_
+_Figure 28: UML diagram showing the implementation of reminders_
 
 The `Reminder` object represents a reminder in iContacts. It contains a `String` variable, which represents
 the actual reminder from the user, and also a `DueDate` object which represents the date and time for the reminder. +
@@ -896,6 +902,7 @@ To save, the `saveReminders` method in `StorageManager` is invoked:
 This will then invoke the `saveReminders` method in `XmlRemindersStorage`, and go on to invoke the `saveRemindersToFile` method in `XmlFileStorage`,
 and the `saveDataToFile` method in `XmlUtil`.
 
+[discrete]
 ==== Design Consideration
 **Aspect:** How to store Reminders in-memory +
 **Alternative 1 (current choice):** Store Reminder objects in UniqueReminderList, independent of AddressBook +
@@ -909,12 +916,12 @@ Cons: Easier to implement
 === Theme-changing mechanism
 
 image::themeChangingMechanism1.png[width="790"]
-_Figure 28 : Component interactions for the theme-changing mechanism_
+_Figure 29 : Component interactions for the theme-changing mechanism_
 
 The theme-changing mechanism is an event-driven mechanism. The above diagram shows the high-level overview of the component interactions for the theme-changing mechanism.
 
 image::themeChangingMechanism2.png[width="790"]
-_Figure 29 : Sequence diagram for the first part of the theme-changing mechanism_
+_Figure 30 : Sequence diagram for the first part of the theme-changing mechanism_
 
 As shown from the sequence diagram above, after the user entered the command `theme sky`, a new object `ThemeCommand` will be created. The `LogicManager` will then execute `ThemeCommand`, and the event `ChangeThemeRequestEvent` will be posted by `EventsCenter`. The code snippet below shows the `execute()` method of `ThemeCommand`:
 
@@ -929,7 +936,7 @@ public class ThemeCommand extends Command {
 ----
 
 image::themeChangingMechanism3.png[width="790"]
-_Figure 30 : Sequence diagram for the second part of the theme-changing mechanism_
+_Figure 31 : Sequence diagram for the second part of the theme-changing mechanism_
 
 As shown from the sequence diagram above, the method `handleChangeThemeEvent()` in `MainWindow` will handle the event and change the theme of the address book through the method `changeTheme()` accordingly.
 // end::theme[]
@@ -978,7 +985,7 @@ For the `FindCommand` to work properly `nameKeywords` must be non-empty. The cod
     }
 ----
 // end::find[]
- 
+
 === Logging
 
 We are using `java.util.logging` package for logging. The `LogsCenter` class is used to manage the logging levels and logging destinations.
